@@ -1,11 +1,11 @@
 :root {
-  --bg-app: #0b111e;
-  --bg-surface: #111a2e;
-  --bg-surface-elevated: #16223b;
-  --bg-surface-subtle: #0d1526;
+  --bg-app: #080d1a;
+  --bg-surface: #0f172a;
+  --bg-surface-elevated: #1e293b;
+  --bg-surface-subtle: #090e1d;
   
-  --border-subtle: #1e2d4a;
-  --border-medium: #27395c;
+  --border-subtle: #1e293b;
+  --border-medium: #334155;
   --border-accent: #38bdf8;
   
   --text-primary: #f8fafc;
@@ -1555,7 +1555,7 @@ body {
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, 0.75);
   backdrop-filter: blur(4px);
   z-index: 1000;
   display: flex;
