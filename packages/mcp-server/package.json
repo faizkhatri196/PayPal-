@@ -1,0 +1,21 @@
+{
+  "name": "@holdfast/mcp-server",
+  "version": "1.0.0",
+  "type": "module",
+  "bin": {
+    "holdfast-mcp": "./dist/index.js"
+  },
+  "scripts": {
+    "start": "tsx src/index.ts",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.6.1",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.7",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3"
+  }
+}
