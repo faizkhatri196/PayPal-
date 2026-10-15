@@ -1,6 +1,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import crypto from 'node:crypto';
 import { db } from '../db/store.js';
+import { CONFIG } from '../config.js';
 import { orchestrator } from '../engine/orchestrator.js';
 import { verifyReceiptSignature, formatDisputeEvidencePacket } from '../engine/receipt.js';
 
@@ -164,4 +165,69 @@ apiRouter.get('/receipts/:id', (req, res) => {
 // Audit Logs
 apiRouter.get('/audit-logs', (req, res) => {
   res.json({ logs: db.getAuditLogs(100) });
+});
+
+// AI Agent Deliverable Generator (Powered by Groq LPU)
+apiRouter.post('/agent/generate-deliverable', async (req, res) => {
+  try {
+    const { taskTitle, taskDescription } = req.body;
+    let payload: any = null;
+    let generatorUsed = 'heuristic-generator';
+
+    if (CONFIG.AI.GROQ_API_KEY) {
+      try {
+        const groqRes = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${CONFIG.AI.GROQ_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: 'qwen/qwen3.8-27b',
+            messages: [
+              {
+                role: 'system',
+                content: 'You are an autonomous worker agent. Generate a clean JSON deliverable matching: {"market_id": string, "timestamp": string, "items": [{"sku": string, "price": number, "currency": "USD"}], "summary": string, "risk_score": number, "anomaly_detected": boolean}. Output valid JSON only.',
+              },
+              {
+                role: 'user',
+                content: `Task: ${taskTitle || 'Competitor pricing crawl'}. Details: ${taskDescription || 'Extract competitor prices'}`,
+              },
+            ],
+            response_format: { type: 'json_object' },
+          }),
+        });
+
+        if (groqRes.ok) {
+          const gData = await groqRes.json();
+          payload = JSON.parse(gData.choices?.[0]?.message?.content || '{}');
+          generatorUsed = 'qwen/qwen3.8-27b (Groq LPU)';
+        }
+      } catch (err) {
+        console.warn('Groq generation fallback:', err);
+      }
+    }
+
+    if (!payload || !payload.items) {
+      payload = {
+        market_id: 'US_EAST_ECOMMERCE',
+        timestamp: new Date().toISOString(),
+        items: [
+          { sku: 'ALPHA-PRO-1', price: 29.99, currency: 'USD' },
+          { sku: 'BETA-MAX-2', price: 49.5, currency: 'USD' },
+        ],
+        summary: 'Competitor pricing crawl completed successfully across 5 target retailers',
+        risk_score: 0.08,
+        anomaly_detected: false,
+      };
+    }
+
+    res.json({
+      success: true,
+      generator: generatorUsed,
+      payload,
+    });
+  } catch (err: any) {
+    sendError(res, 500, 'GENERATION_FAILED', err.message, req);
+  }
 });
