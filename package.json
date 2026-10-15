@@ -1,0 +1,23 @@
+{
+  "name": "holdfast-protocol",
+  "version": "1.0.0",
+  "description": "Holdfast: Acceptance Receipt & Escrow Protocol for Autonomous Agentic Commerce on PayPal",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev --workspace=apps/server\" \"npm run dev --workspace=apps/web\"",
+    "build": "npm run build --workspaces",
+    "test": "vitest run",
+    "test:proof": "vitest run tests/proof-suite.test.ts"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "typescript": "^5.7.3",
+    "vitest": "^3.0.5"
+  },
+  "author": "Holdfast Team",
+  "license": "MIT"
+}

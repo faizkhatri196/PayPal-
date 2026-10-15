@@ -1,0 +1,32 @@
+# Environment and credentials
+.env
+.env.*
+!.env.example
+
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build outputs
+dist/
+build/
+*.tsbuildinfo
+
+# Data stores and local databases
+data/
+*.db
+*.sqlite
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# System and editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
