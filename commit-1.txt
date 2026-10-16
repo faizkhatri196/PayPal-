@@ -1,3 +1,0 @@
-Automated commit 1 of 10.
-
-This file was added by an automated request to create multiple commits for the repository.
