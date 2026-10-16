@@ -1,13 +1,25 @@
 import crypto from 'node:crypto';
 import { MilestoneCriteria } from '../db/store.js';
 
+/**
+ * Verification outcome of Gate 1: Deterministic Engine.
+ * Only code that satisfies these assertions can permit fund progression.
+ */
 export interface DeterministicResult {
+  /** Whether all deterministic schema, key, and bounds checks succeeded */
   passed: boolean;
+  /** SHA-256 cryptographic digest of the canonical deliverable payload */
   deliverable_hash: string;
+  /** Individual assertion items evaluated during verification */
   checks_run: Array<{ name: string; passed: boolean; message: string }>;
+  /** Specific rule violation description if passed === false */
   failure_reason?: string;
 }
 
+/**
+ * Computes a deterministic SHA-256 cryptographic hash of a deliverable payload.
+ * Sorts object keys to ensure canonical serialization across heterogeneous client environments.
+ */
 export function computeDeliverableHash(payload: any): string {
   const canonicalString = typeof payload === 'string' 
     ? payload 
