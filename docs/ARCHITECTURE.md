@@ -90,3 +90,36 @@ graph TD
 | **Acceptance Receipt Tampering** | Medium | **HMAC-SHA256 Digital Signature:** Mints digital signature over canonical string. Tampering invalidates signature. |
 | **API Secret Exposure** | Critical | **Backend Isolation:** PayPal and AI credentials stay on server. 0 secrets in browser or Git. |
 
+---
+
+## 5. Central 5-Stage Payment Workflow & AI Allocation
+
+Holdfast simplifies multi-stage agentic commerce into five sequential, inspectable stages:
+
+```
+[ Stage 1: AI Agent Completes Work ]
+  Engine: Groq LPU (qwen/qwen3.8-27b)
+  Role: Autonomous Worker Proposer (Zero Financial Authority)
+      │
+      ▼
+[ Stage 2: Holdfast Verifies Result ]
+  Engine: Gate 1 Deterministic Engine
+  Role: Schema, Key, and Arithmetic Bounds Verifier (Sole Authority to Release Funds)
+      │
+      ▼
+[ Stage 3: Payment Approved or Blocked ]
+  Engine: Gate 2 Gemini 2.5 Flash / Security Filter
+  Role: Adversarial Auditor (Veto-Only: Detects Prompt Injections & Anomalies)
+      │
+      ▼
+[ Stage 4: PayPal Processes Payment ]
+  Engine: PayPal Orders v2 & Payments v2 Sandbox
+  Role: Idempotent Non-Custodial Pre-Auth Hold & Tranche Capture
+      │
+      ▼
+[ Stage 5: Proof is Recorded ]
+  Engine: Cryptographic Receipt Engine
+  Role: HMAC-SHA256 Signed Evidence Packet for PayPal Resolution Center
+```
+
+
