@@ -236,3 +236,57 @@ When an error occurs, Holdfast returns a standard structured error envelope:
   "dispute_evidence_packet": "=== PAYPAL DISPUTE EVIDENCE PACKET: ACCEPTANCE PROOF ===\n..."
 }
 ```
+
+---
+
+### 9. AI Agent Deliverable Generator (Groq LPU)
+* **Method:** `POST`
+* **Path:** `/agent/generate-deliverable`
+* **Purpose:** Generates a clean JSON milestone deliverable matching required schema criteria using Groq LPU (`qwen/qwen3.8-27b`).
+* **Request Body:**
+```json
+{
+  "taskTitle": "Competitor pricing crawl",
+  "taskDescription": "Extract raw product prices from online retailers"
+}
+```
+* **Response (200 OK):**
+```json
+{
+  "success": true,
+  "generator": "qwen/qwen3.8-27b (Groq LPU)",
+  "payload": {
+    "market_id": "US_EAST_ECOMMERCE",
+    "timestamp": "2026-10-15T16:00:00.000Z",
+    "items": [
+      { "sku": "ALPHA-PRO-1", "price": 29.99, "currency": "USD" },
+      { "sku": "BETA-MAX-2", "price": 49.50, "currency": "USD" }
+    ],
+    "summary": "Competitor pricing crawl completed successfully across 5 target retailers",
+    "risk_score": 0.08,
+    "anomaly_detected": false
+  }
+}
+```
+
+---
+
+### 10. Audit Event Telemetry Stream
+* **Method:** `GET`
+* **Path:** `/audit-logs`
+* **Purpose:** Returns the chronological write-ahead event trail for system telemetry and dispute auditability.
+* **Response (200 OK):**
+```json
+{
+  "logs": [
+    {
+      "id": "log_a1b2c3d4",
+      "contract_id": "ct_intel_pipeline_2026",
+      "event": "MILESTONE_ACCEPTED_AND_SETTLED",
+      "details": { "capture_id": "CAP_987654321", "amount": "15.00" },
+      "timestamp": "2026-10-15T12:00:00.000Z"
+    }
+  ]
+}
+```
+
