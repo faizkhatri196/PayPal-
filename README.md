@@ -4,7 +4,7 @@
 [![MIT License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![PayPal API](https://img.shields.io/badge/PayPal-Orders%20v2%20%7C%20Payments%20v2-0070BA.svg)](https://developer.paypal.com)
 [![Model Context Protocol](https://img.shields.io/badge/MCP-Standard%20v1.0-purple.svg)](https://modelcontextprotocol.io)
-[![Test Suite](https://img.shields.io/badge/Vitest-10%2F10%20Passing%20(42ms)-emerald.svg)](tests/proof-suite.test.ts)
+[![Test Suite](https://img.shields.io/badge/Vitest-21%2F21%20Passing%20(918ms)-emerald.svg)](tests/proof-suite.test.ts)
 
 > **Category Target:** *Best Use of Agentic Commerce ($5,000)* & *Grand Prize*  
 > **Submission Deadline:** November 12, 2026
