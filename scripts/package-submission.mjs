@@ -39,12 +39,13 @@ function copyDirRecursive(src, dest) {
     const srcPath = path.join(src, entry.name);
     const destPath = path.join(dest, entry.name);
 
-    if (entry.isDirectory()) {
+    const stat = fs.statSync(srcPath);
+    if (stat.isDirectory()) {
       if (EXCLUDE_DIRS.has(entry.name)) {
         continue;
       }
       copyDirRecursive(srcPath, destPath);
-    } else if (entry.isFile()) {
+    } else if (stat.isFile()) {
       if (EXCLUDE_FILES.has(entry.name)) {
         continue;
       }
