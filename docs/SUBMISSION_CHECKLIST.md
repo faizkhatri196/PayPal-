@@ -3,7 +3,7 @@
 **Hackathon:** "Build What's Next with PayPal and AI"  
 **Official Devpost URL:** [https://paypalaihackathon.devpost.com/](https://paypalaihackathon.devpost.com/)  
 **Official Rules URL:** [https://paypalaihackathon.devpost.com/rules](https://paypalaihackathon.devpost.com/rules)  
-**Target Category:** Best Use of Agentic Commerce ($5,000) & Grand Prize  
+**Track Focus:** Agentic Commerce with PayPal and AI  
 **Review Status:** **VERIFIED & PREPARED FOR FINAL SUBMISSION**
 
 ---

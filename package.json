@@ -1,7 +1,7 @@
 {
   "name": "holdfast-protocol",
   "version": "1.0.0",
-  "description": "Holdfast: Acceptance Receipt & Escrow Protocol for Autonomous Agentic Commerce on PayPal",
+  "description": "Trustworthy payment decisions for AI-powered commerce on PayPal",
   "private": true,
   "workspaces": [
     "apps/*",

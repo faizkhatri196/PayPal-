@@ -7,11 +7,11 @@
 ## 1. Project Information
 
 - **Project Name:** Holdfast Protocol
-- **Target Category:** Agentic Commerce / AI Agent Infrastructure
+- **Track Focus:** Agentic Commerce / AI Agent Infrastructure
+- **Tagline:** Trustworthy payment decisions for AI-powered commerce.
 - **GitHub Repository:** [https://github.com/faizkhatri196/PayPal-Hackthon](https://github.com/faizkhatri196/PayPal-Hackthon)
-- **Primary Demonstration Video:** `final_video/Holdfast_Protocol_Demo.mp4` (Full Master, 3m 28s)
-- **Strict 3-Minute Video:** `final_video/Holdfast_Protocol_Demo_3min.mp4` (Devpost-compliant, 2m 58s)
-- **Subtitles:** `final_video/Holdfast_Protocol_Demo.srt` & `final_video/Holdfast_Protocol_Demo_3min.srt`
+- **Demonstration Video:** Scripted at 2m 50s in `docs/DEMO_SCRIPT.md` (Public YouTube link to be provided on Devpost)
+- **Pitch Deck:** `presentation/Holdfast-Protocol-Pitch.pptx` (6 concise slides)
 
 ---
 
