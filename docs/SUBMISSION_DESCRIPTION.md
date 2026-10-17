@@ -10,7 +10,7 @@
 - **Track Focus:** Agentic Commerce / AI Agent Infrastructure
 - **Tagline:** Trustworthy payment decisions for AI-powered commerce.
 - **GitHub Repository:** [https://github.com/faizkhatri196/PayPal-Hackthon](https://github.com/faizkhatri196/PayPal-Hackthon)
-- **Demonstration Video:** Scripted at 2m 50s in `docs/DEMO_SCRIPT.md` (Public YouTube link to be provided on Devpost)
+- **Demonstration Video:** `demo/Holdfast-Protocol-Demo.mp4` (2m 48s, 1920x1080 30 FPS, synchronized English voice-over)
 - **Pitch Deck:** `presentation/Holdfast-Protocol-Pitch.pptx` (6 concise slides)
 
 ---

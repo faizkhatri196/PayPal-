@@ -54,7 +54,6 @@ if (secretSuspects.length > 0) {
   console.log('Found suspects:', secretSuspects);
 }
 
-// Check key required deliverables
 const requiredDeliverables = [
   'package.json',
   'README.md',
@@ -62,8 +61,11 @@ const requiredDeliverables = [
   path.join('docs', 'SUBMISSION_CHECKLIST.md'),
   path.join('docs', 'SECURITY_REVIEW.md'),
   path.join('docs', 'TEST_REPORT.md'),
-  path.join('docs', 'DEMO_SCRIPT.md'),
-  path.join('docs', 'VIDEO_RECORDING_GUIDE.md'),
+  path.join('docs', 'API.md'),
+  path.join('docs', 'ARCHITECTURE.md'),
+  path.join('docs', 'PAYPAL_SANDBOX_GUIDE.md'),
+  path.join('presentation', 'Holdfast-Protocol-Pitch.pptx'),
+  path.join('demo', 'Holdfast-Protocol-Demo.mp4'),
   path.join('apps', 'server', 'src', 'index.ts'),
   path.join('apps', 'web', 'src', 'App.tsx'),
   path.join('tests', 'proof-suite.test.ts'),
