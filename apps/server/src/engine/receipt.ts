@@ -1,9 +1,10 @@
 import crypto from 'node:crypto';
+import { CONFIG } from '../config.js';
 import { AcceptanceReceipt, db, Milestone, Contract } from '../db/store.js';
 import { DeterministicResult } from '../verifier/deterministic.js';
 import { AdversarialResult } from '../verifier/adversarial.js';
 
-const RECEIPT_SIGNING_SECRET = process.env.RECEIPT_SECRET || 'holdfast_receipt_hmac_secret_2026';
+const RECEIPT_SIGNING_SECRET = CONFIG.SECURITY.RECEIPT_SECRET;
 
 export function issueAcceptanceReceipt(
   contract: Contract,

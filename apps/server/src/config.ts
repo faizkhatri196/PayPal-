@@ -27,6 +27,9 @@ export const CONFIG = {
     GROQ_API_KEY: process.env.GROQ_API_KEY || '',
     PROVIDER: process.env.AI_PROVIDER || 'gemini',
   },
+  SECURITY: {
+    RECEIPT_SECRET: process.env.RECEIPT_SECRET || 'holdfast_receipt_hmac_secret_2026',
+  },
 };
 
 if (!CONFIG.PAYPAL.CLIENT_ID || !CONFIG.PAYPAL.CLIENT_SECRET) {

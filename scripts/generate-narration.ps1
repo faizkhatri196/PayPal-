@@ -1,6 +1,6 @@
 Add-Type -AssemblyName System.Speech
 
-$outputDir = "C:\Users\Infinity\OneDrive\Desktop\Holdfast-Protocol-Submission\final_video"
+$outputDir = if ($env:SUBMISSION_DIR) { Join-Path $env:SUBMISSION_DIR "final_video" } else { Join-Path (Split-Path -Parent $PSScriptRoot) "Holdfast-Protocol-Submission\final_video" }
 if (-not (Test-Path $outputDir)) {
     New-Item -ItemType Directory -Path $outputDir -Force | Out-Null
 }

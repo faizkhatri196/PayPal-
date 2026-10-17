@@ -2,9 +2,11 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execSync } from 'node:child_process';
 
-const FFMPEG = 'C:\\Users\\Infinity\\.gemini\\antigravity-ide\\scratch\\ai-candidate-analyzer\\node_modules\\ffmpeg-static\\ffmpeg.exe';
-const ARTIFACT_DIR = 'C:\\Users\\Infinity\\.gemini\\antigravity-ide\\brain\\f023c068-e354-4f6d-a453-93a43cf68c81';
-const SUBMISSION_DIR = 'C:\\Users\\Infinity\\OneDrive\\Desktop\\Holdfast-Protocol-Submission\\final_video';
+const FFMPEG = process.env.FFMPEG_PATH || 'ffmpeg';
+const ARTIFACT_DIR = process.env.ARTIFACT_DIR || path.resolve(process.cwd(), 'artifacts');
+const SUBMISSION_DIR = process.env.SUBMISSION_DIR 
+  ? path.resolve(process.env.SUBMISSION_DIR, 'final_video')
+  : path.resolve(process.cwd(), '..', 'Holdfast-Protocol-Submission', 'final_video');
 const AUDIO_FILE = path.join(SUBMISSION_DIR, 'voiceover.wav');
 const SRT_FILE = path.join(SUBMISSION_DIR, 'Holdfast_Protocol_Demo.srt');
 const OUTPUT_MP4 = path.join(SUBMISSION_DIR, 'Holdfast_Protocol_Demo.mp4');

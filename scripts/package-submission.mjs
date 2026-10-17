@@ -15,6 +15,9 @@ const EXCLUDE_DIRS = new Set([
   'build',
   '.system_generated',
   '.tempmediaStorage',
+  'Holdfast-Protocol-Submission',
+  '.vscode',
+  '.idea',
 ]);
 
 const EXCLUDE_FILES = new Set([
@@ -22,6 +25,7 @@ const EXCLUDE_FILES = new Set([
   '.env.local',
   '.DS_Store',
   'Thumbs.db',
+  'Holdfast_Protocol_Submission.zip',
 ]);
 
 function copyDirRecursive(src, dest) {

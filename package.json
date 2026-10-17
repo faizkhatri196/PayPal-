@@ -11,7 +11,9 @@
     "dev": "concurrently \"npm run dev --workspace=apps/server\" \"npm run dev --workspace=apps/web\"",
     "build": "npm run build --workspaces",
     "test": "vitest run",
-    "test:proof": "vitest run tests/proof-suite.test.ts"
+    "test:proof": "vitest run tests/proof-suite.test.ts",
+    "health-check": "node scripts/health-check.mjs",
+    "package:submission": "node scripts/package-submission.mjs"
   },
   "devDependencies": {
     "concurrently": "^9.1.2",

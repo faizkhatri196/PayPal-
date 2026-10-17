@@ -30,3 +30,7 @@ pnpm-debug.log*
 Thumbs.db
 .idea/
 .vscode/
+
+# Submission folder and archives
+Holdfast-Protocol-Submission/
+*.zip

@@ -1,7 +1,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-const finalDir = 'C:\\Users\\Infinity\\OneDrive\\Desktop\\Holdfast-Protocol-Submission\\final_video';
+const finalDir = process.env.SUBMISSION_DIR 
+  ? path.resolve(process.env.SUBMISSION_DIR, 'final_video')
+  : path.resolve(process.cwd(), '..', 'Holdfast-Protocol-Submission', 'final_video');
 const originalSrt = path.join(finalDir, 'Holdfast_Protocol_Demo.srt');
 const scaledSrt = path.join(finalDir, 'Holdfast_Protocol_Demo_3min.srt');
 
