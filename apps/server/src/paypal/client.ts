@@ -36,7 +36,8 @@ class PayPalClient {
     }
 
     const start = Date.now();
-    const res = await fetch(url, { ...options, headers });
+    const signal = options.signal || AbortSignal.timeout(4000);
+    const res = await fetch(url, { ...options, headers, signal });
     const latencyMs = Date.now() - start;
 
     let body: any = null;
@@ -56,7 +57,113 @@ class PayPalClient {
     };
   }
 
+  clearCache() {
+    this.cachedToken = null;
+    this.tokenExpiresAt = 0;
+  }
+
+  async checkConnection(): Promise<{
+    status: 'CONNECTED' | 'CONNECTION_FAILED' | 'NOT_CONFIGURED';
+    connected: boolean;
+    environment: 'PayPal Sandbox' | 'PayPal Live' | 'Unconfigured';
+    clientIdConfigured: boolean;
+    clientSecretConfigured: boolean;
+    latencyMs?: number;
+    error?: string;
+    checkedAt: string;
+  }> {
+    const clientId = CONFIG.PAYPAL.CLIENT_ID?.trim();
+    const clientSecret = CONFIG.PAYPAL.CLIENT_SECRET?.trim();
+    const isSandbox = CONFIG.PAYPAL.BASE_URL.includes('sandbox');
+    const environment = !clientId ? 'Unconfigured' : isSandbox ? 'PayPal Sandbox' : 'PayPal Live';
+
+    if (!clientId || !clientSecret) {
+      return {
+        status: 'NOT_CONFIGURED',
+        connected: false,
+        environment: 'Unconfigured',
+        clientIdConfigured: Boolean(clientId),
+        clientSecretConfigured: Boolean(clientSecret),
+        error: 'PayPal credentials not set. Set PAYPAL_CLIENT_ID and PAYPAL_CLIENT_SECRET in server environment.',
+        checkedAt: new Date().toISOString(),
+      };
+    }
+
+    try {
+      const start = Date.now();
+      const authHeader = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
+      const res = await this.fetchAPI(
+        '/v1/oauth2/token',
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Basic ${authHeader}`,
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: 'grant_type=client_credentials',
+        },
+        false
+      );
+
+      const latencyMs = Date.now() - start;
+
+      if (!res.ok) {
+        const errorDesc = res.body?.error_description || res.body?.message || `HTTP ${res.status}`;
+        return {
+          status: 'CONNECTION_FAILED',
+          connected: false,
+          environment,
+          clientIdConfigured: true,
+          clientSecretConfigured: true,
+          latencyMs,
+          error: `PayPal Sandbox Authentication Failed: ${errorDesc}`,
+          checkedAt: new Date().toISOString(),
+        };
+      }
+
+      if (!res.body?.access_token) {
+        return {
+          status: 'CONNECTION_FAILED',
+          connected: false,
+          environment,
+          clientIdConfigured: true,
+          clientSecretConfigured: true,
+          latencyMs,
+          error: 'No access token in response from PayPal OAuth service',
+          checkedAt: new Date().toISOString(),
+        };
+      }
+
+      this.cachedToken = res.body.access_token as string;
+      this.tokenExpiresAt = Date.now() + (res.body.expires_in || 3600) * 1000;
+
+      return {
+        status: 'CONNECTED',
+        connected: true,
+        environment,
+        clientIdConfigured: true,
+        clientSecretConfigured: true,
+        latencyMs,
+        checkedAt: new Date().toISOString(),
+      };
+    } catch (err: any) {
+      return {
+        status: 'CONNECTION_FAILED',
+        connected: false,
+        environment,
+        clientIdConfigured: true,
+        clientSecretConfigured: true,
+        error: err.message || 'Network error reaching PayPal Sandbox endpoint',
+        checkedAt: new Date().toISOString(),
+      };
+    }
+  }
+
   async getAccessToken(): Promise<string> {
+    if (!CONFIG.PAYPAL.CLIENT_ID || !CONFIG.PAYPAL.CLIENT_SECRET) {
+      throw new Error('[PayPal Client Error] PayPal Client ID or Secret is not configured in environment.');
+    }
+
     const now = Date.now();
     if (this.cachedToken && now < this.tokenExpiresAt - 300_000) {
       return this.cachedToken;
@@ -111,7 +218,7 @@ class PayPalClient {
         {
           reference_id: `holdfast_${contractId}`,
           custom_id: contractHash,
-          description: `Holdfast Escrow for Contract ${contractId}`,
+          description: `Holdfast Authorization Hold for Contract ${contractId}`,
           amount: {
             currency_code: 'USD',
             value: totalAmount,
@@ -126,8 +233,8 @@ class PayPalClient {
         brand_name: 'Holdfast Protocol',
         landing_page: 'NO_PREFERENCE',
         user_action: 'CONTINUE',
-        return_url: `http://localhost:${CONFIG.PORT}/api/paypal/return?contractId=${contractId}`,
-        cancel_url: `http://localhost:${CONFIG.PORT}/api/paypal/cancel?contractId=${contractId}`,
+        return_url: `${CONFIG.APP_URL}/api/paypal/return?contractId=${contractId}`,
+        cancel_url: `${CONFIG.APP_URL}/api/paypal/cancel?contractId=${contractId}`,
       },
     };
 
@@ -153,6 +260,16 @@ class PayPalClient {
       status: res.body.status,
       approveUrl,
     };
+  }
+
+  async getOrder(orderId: string): Promise<any> {
+    const res = await this.fetchAPI(`/v2/checkout/orders/${orderId}`, {
+      method: 'GET',
+    });
+    if (!res.ok) {
+      throw new Error(`[PayPal Get Order Failed] HTTP ${res.status}: ${JSON.stringify(res.body)}`);
+    }
+    return res.body;
   }
 
   async authorizeOrder(orderId: string): Promise<PayPalAuthResult> {

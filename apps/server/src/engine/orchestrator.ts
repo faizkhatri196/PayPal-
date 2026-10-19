@@ -101,8 +101,20 @@ export class EscrowOrchestrator {
       if (!contract) throw new Error(`Contract ${contractId} not found`);
       if (!contract.paypal_order_id) throw new Error('Contract missing PayPal order ID');
 
-      // Call PayPal authorize to lock the funds
-      const authResult = await paypal.authorizeOrder(contract.paypal_order_id);
+      const isDemo = contract.paypal_order_id.startsWith('DEMO_') || contract.id.startsWith('ct_demo_');
+      let authResult: any;
+
+      if (isDemo) {
+        authResult = {
+          id: `AUTH_DEMO_${crypto.randomUUID().slice(0, 8).toUpperCase()}`,
+          status: 'CREATED',
+          amount: { currency_code: contract.currency, value: contract.total_amount },
+          expiration_time: new Date(Date.now() + 29 * 86400 * 1000).toISOString(),
+        };
+      } else {
+        // Call PayPal authorize to lock the funds
+        authResult = await paypal.authorizeOrder(contract.paypal_order_id);
+      }
 
       const updated = db.updateContract(contractId, {
         status: 'ESCROW_HELD',
@@ -184,10 +196,9 @@ export class EscrowOrchestrator {
         };
       }
 
-      // BOTH GATES PASSED: Settle Tranche on PayPal
-      if (!contract.paypal_auth_id) {
-        throw new Error('Missing PayPal authorization ID for capture');
-      }
+      // BOTH GATES PASSED: Settle Tranche on PayPal (or mock for isolated demo)
+      const isDemo = contract.paypal_order_id?.startsWith('DEMO_') || contract.id.startsWith('ct_demo_');
+      let captureResult: any;
 
       // Compute remaining active milestones (excluding rejected and voided)
       const remainingActive = contract.milestones.filter(
@@ -195,13 +206,27 @@ export class EscrowOrchestrator {
       );
       const isFinalCapture = remainingActive.length === 0;
 
-      const captureReqId = `cap_${crypto.randomUUID()}`;
-      const captureResult = await paypal.captureTranche(
-        contract.paypal_auth_id,
-        milestone.amount,
-        isFinalCapture,
-        captureReqId
-      );
+      if (isDemo) {
+        captureResult = {
+          id: `CAP_DEMO_${crypto.randomUUID().slice(0, 10).toUpperCase()}`,
+          status: 'COMPLETED',
+          amount: { currency_code: milestone.currency, value: milestone.amount },
+          final_capture: isFinalCapture,
+          create_time: new Date().toISOString(),
+        };
+      } else {
+        if (!contract.paypal_auth_id) {
+          throw new Error('Missing PayPal authorization ID for capture');
+        }
+
+        const captureReqId = `cap_${crypto.randomUUID()}`;
+        captureResult = await paypal.captureTranche(
+          contract.paypal_auth_id,
+          milestone.amount,
+          isFinalCapture,
+          captureReqId
+        );
+      }
 
       // Issue Cryptographic Acceptance Receipt
       const receipt = issueAcceptanceReceipt(
@@ -242,10 +267,17 @@ export class EscrowOrchestrator {
     try {
       const contract = db.getContract(contractId);
       if (!contract) throw new Error(`Contract ${contractId} not found`);
-      if (!contract.paypal_auth_id) throw new Error('Contract has no active authorization to void');
 
-      const voidReqId = `void_${crypto.randomUUID()}`;
-      const voidResult = await paypal.voidAuthorization(contract.paypal_auth_id, voidReqId);
+      const isDemo = contract.paypal_order_id?.startsWith('DEMO_') || contract.id.startsWith('ct_demo_');
+      let voidResult: any;
+
+      if (isDemo) {
+        voidResult = { success: true, status: 200, is_demo: true };
+      } else {
+        if (!contract.paypal_auth_id) throw new Error('Contract has no active authorization to void');
+        const voidReqId = `void_${crypto.randomUUID()}`;
+        voidResult = await paypal.voidAuthorization(contract.paypal_auth_id, voidReqId);
+      }
 
       // Mark all pending milestones as voided
       for (const m of contract.milestones) {

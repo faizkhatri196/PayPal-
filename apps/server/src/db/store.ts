@@ -87,13 +87,65 @@ export interface AuditLog {
   id: string;
   contract_id?: string;
   event: string;
+  actor?: string;
   details: any;
   timestamp: string;
+}
+
+export interface ApprovalRequest {
+  id: string;
+  operation: 'TRANCHE_CAPTURE' | 'VOID_REMAINDER' | 'POLICY_OVERRIDE_REVIEW' | 'CONTRACT_DISBURSEMENT';
+  contract_id: string;
+  milestone_id?: string;
+  contract_title: string;
+  amount: string;
+  currency: string;
+  status: 'PENDING' | 'APPROVED' | 'REJECTED';
+  requested_by: string;
+  required_role: string;
+  approved_by?: string;
+  approved_at?: string;
+  rationale?: string;
+  policy_checks: Array<{ code: string; passed: boolean; message: string }>;
+  ai_risk_severity: 'low' | 'medium' | 'high' | 'critical';
+  ai_recommendation_summary: string;
+  created_at: string;
+}
+
+export interface TransactionRecord {
+  id: string;
+  contract_id: string;
+  milestone_id?: string;
+  title: string;
+  provider: string;
+  data_source: 'Simulated Demo' | 'Live PayPal Sandbox';
+  is_simulated: boolean;
+  amount: string;
+  currency: string;
+  payment_state: 'Authorized' | 'Captured' | 'Held' | 'Voided' | 'Pending Review';
+  verification: 'Passed' | 'Rejected' | 'Pending' | 'Vetoed';
+  risk: 'Low' | 'Medium' | 'High' | 'Review Required';
+  ai_assessment: string;
+  reconciliation: 'Confirmed' | 'Pending Sync' | 'Reconciled' | 'Desynced';
+  updated_at: string;
+  details: {
+    paypal_order_id?: string;
+    paypal_auth_id?: string;
+    paypal_capture_id?: string;
+    buyer_agent_id: string;
+    worker_agent_id: string;
+    deliverable_hash?: string;
+    receipt_id?: string;
+    verification_trace?: any;
+    audit_events_count: number;
+    requires_human_approval: boolean;
+  };
 }
 
 interface DBState {
   contracts: Record<string, Contract>;
   receipts: Record<string, AcceptanceReceipt>;
+  approvals: Record<string, ApprovalRequest>;
   audit_logs: AuditLog[];
 }
 
@@ -102,12 +154,15 @@ export class DataStore {
   private state: DBState = {
     contracts: {},
     receipts: {},
+    approvals: {},
     audit_logs: [],
   };
 
+  private isTest: boolean;
+
   constructor(dbFileName?: string) {
-    const isTest = process.env.NODE_ENV === 'test' || Boolean(process.env.VITEST);
-    const defaultFile = isTest ? 'holdfast-store.test.json' : 'holdfast-store.json';
+    this.isTest = process.env.NODE_ENV === 'test' || Boolean(process.env.VITEST);
+    const defaultFile = this.isTest ? 'holdfast-store.test.json' : 'holdfast-store.json';
     const fileName = dbFileName || process.env.HOLDFAST_DB_FILE || defaultFile;
 
     const dataDir = path.resolve(process.cwd(), 'data');
@@ -118,16 +173,23 @@ export class DataStore {
     this.load();
 
     // If not a test and contracts are missing or lack demonstration tranches, seed realistic data
-    if (!isTest && (!this.state.contracts['ct_intel_pipeline_2026'] || !this.state.contracts['ct_reconcile_test'])) {
+    if (!this.isTest && (!this.state.contracts['ct_intel_pipeline_2026'] || !this.state.contracts['ct_reconcile_test'])) {
       this.seedInitialData();
     }
   }
 
   private load() {
+    if (this.isTest) return; // Keep memory state in test workers to avoid cross-file race conditions
     try {
       if (fs.existsSync(this.filePath)) {
         const raw = fs.readFileSync(this.filePath, 'utf8');
-        this.state = JSON.parse(raw);
+        const parsed = JSON.parse(raw);
+        this.state = {
+          contracts: parsed.contracts || {},
+          receipts: parsed.receipts || {},
+          approvals: parsed.approvals || {},
+          audit_logs: parsed.audit_logs || [],
+        };
       }
     } catch (err) {
       console.warn('[DataStore] Failed to read existing store file, starting empty:', err);
@@ -135,8 +197,11 @@ export class DataStore {
   }
 
   private persist() {
+    if (this.isTest) return;
     try {
-      fs.writeFileSync(this.filePath, JSON.stringify(this.state, null, 2), 'utf8');
+      const tmp = `${this.filePath}.tmp.${Date.now()}`;
+      fs.writeFileSync(tmp, JSON.stringify(this.state, null, 2), 'utf8');
+      fs.renameSync(tmp, this.filePath);
     } catch (err) {
       console.error('[DataStore] Persist error:', err);
     }
@@ -286,9 +351,61 @@ export class DataStore {
       updated_at: now,
     };
 
+    // 4. Deterministic Ceiling Rejection Contract ($150 requested against $100 authorized hold)
+    const ceilingRejectionContract: Contract = {
+      id: 'ct_ceiling_breach_demo',
+      title: 'Ceiling Breach Test ($150 requested on $100 hold)',
+      description: 'Agent requested $150.00 payout exceeding the $100.00 pre-authorized ceiling. Gate 1 halted execution before capture ($0 moved).',
+      buyer_agent_id: 'agent_buyer_risk_control',
+      worker_agent_id: 'agent_rogue_worker',
+      total_amount: '100.00',
+      currency: 'USD',
+      status: 'ESCROW_HELD',
+      paypal_order_id: 'DEMO_ORD_CEIL_9901',
+      paypal_auth_id: 'AUTH_DEMO_CEIL_7741',
+      custom_contract_hash: 'hash_ceil_breach_test',
+      milestones: [
+        {
+          id: 'ms_ceil_breach_01',
+          contract_id: 'ct_ceiling_breach_demo',
+          sequence: 1,
+          title: 'Excessive Tranche Settlement Request',
+          description: 'Autonomous worker requested payout exceeding maximum authorized ceiling.',
+          amount: '150.00',
+          currency: 'USD',
+          status: 'REJECTED',
+          criteria: {
+            schema_type: 'pricing_report',
+            required_keys: ['items', 'summary'],
+            min_items: 1,
+          },
+          rejection_reason: 'Gate 1 Deterministic Error: Requested capture amount ($150.00) exceeds remaining authorized hold ceiling ($100.00). Capture blocked.',
+          verification_trace: {
+            deterministic: {
+              passed: false,
+              checks_run: [
+                { name: 'PAYLOAD_SCHEMA', passed: true, message: 'Valid JSON schema' },
+                { name: 'FINANCIAL_BOUNDS_CEILING', passed: false, message: 'Requested $150.00 exceeds authorized ceiling of $100.00' },
+              ],
+              failure_reason: 'Requested capture amount ($150.00) exceeds remaining authorized hold ceiling ($100.00).',
+            },
+            adversarial: {
+              vetoed: false,
+              model_used: 'heuristic-guard',
+              confidence: 0.99,
+              note: 'Gate 2 bypassed because Gate 1 deterministic check failed.',
+            },
+          },
+        },
+      ],
+      created_at: settledTime,
+      updated_at: now,
+    };
+
     // Persist into state
     this.state.contracts[demoContract.id] = demoContract;
     this.state.contracts[reconcileContract.id] = reconcileContract;
+    this.state.contracts[ceilingRejectionContract.id] = ceilingRejectionContract;
     this.state.receipts[demoReceipt.receipt_id] = demoReceipt;
 
     // Seed audit logs
@@ -329,6 +446,29 @@ export class DataStore {
         timestamp: settledTime,
       },
     ];
+
+    // 4. Seed initial demonstration approval items
+    const demoApproval: ApprovalRequest = {
+      id: 'appr_sample_review_01',
+      operation: 'TRANCHE_CAPTURE',
+      contract_id: demoContract.id,
+      milestone_id: 'ms_outlier_model',
+      contract_title: demoContract.title,
+      amount: '20.00',
+      currency: 'USD',
+      status: 'PENDING',
+      requested_by: 'agent_crawler_node_4',
+      required_role: 'Operations Lead',
+      policy_checks: [
+        { code: 'POL_AMOUNT_BOUND', passed: true, message: 'Amount $20.00 within remaining authorized hold ($20.00)' },
+        { code: 'POL_CURRENCY_MATCH', passed: true, message: 'Currency USD matches authorization' },
+        { code: 'POL_HIGH_VALUE_THRESHOLD', passed: false, message: 'Automated policy flagged for secondary operator sign-off' },
+      ],
+      ai_risk_severity: 'medium',
+      ai_recommendation_summary: 'Outlier model deliverable requires confirmation of dataset calibration parameters before settlement.',
+      created_at: new Date(Date.now() - 1800000).toISOString(),
+    };
+    this.state.approvals[demoApproval.id] = demoApproval;
 
     this.persist();
   }
@@ -429,13 +569,200 @@ export class DataStore {
     return log;
   }
 
-  getAuditLogs(limit = 100): AuditLog[] {
+  addAuditLog(log: Partial<AuditLog> & { event: string }): AuditLog {
+    const fullLog: AuditLog = {
+      id: log.id || `audit_${crypto.randomUUID()}`,
+      contract_id: log.contract_id,
+      event: log.event,
+      actor: log.actor,
+      details: log.details || {},
+      timestamp: log.timestamp || new Date().toISOString(),
+    };
+    this.state.audit_logs.unshift(fullLog);
+    if (this.state.audit_logs.length > 500) {
+      this.state.audit_logs.pop();
+    }
+    this.persist();
+    return fullLog;
+  }
+
+  getAuditLogs(limitOrContractId?: number | string): AuditLog[] {
     this.load();
+    if (typeof limitOrContractId === 'string') {
+      return this.state.audit_logs.filter((l) => l.contract_id === limitOrContractId);
+    }
+    const limit = typeof limitOrContractId === 'number' ? limitOrContractId : 100;
     return this.state.audit_logs.slice(0, limit);
   }
 
+  // Approval Methods
+  getApprovals(): ApprovalRequest[] {
+    this.load();
+    return Object.values(this.state.approvals || {}).sort(
+      (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    );
+  }
+
+  getApproval(id: string): ApprovalRequest | null {
+    this.load();
+    return this.state.approvals?.[id] || null;
+  }
+
+  createApproval(data: Omit<ApprovalRequest, 'id' | 'created_at' | 'status'>): ApprovalRequest {
+    const id = `appr_${crypto.randomUUID().slice(0, 8)}`;
+    const approval: ApprovalRequest = {
+      ...data,
+      id,
+      status: 'PENDING',
+      created_at: new Date().toISOString(),
+    };
+    if (!this.state.approvals) this.state.approvals = {};
+    this.state.approvals[id] = approval;
+    this.persist();
+    this.logAudit(approval.contract_id, 'APPROVAL_REQUESTED', {
+      approval_id: id,
+      operation: approval.operation,
+      amount: approval.amount,
+      requested_by: approval.requested_by,
+      required_role: approval.required_role,
+    });
+    return approval;
+  }
+
+  resolveApproval(
+    id: string,
+    status: 'APPROVED' | 'REJECTED',
+    approvedBy: string,
+    rationale?: string
+  ): ApprovalRequest | null {
+    this.load();
+    const approval = this.state.approvals?.[id];
+    if (!approval) return null;
+    approval.status = status;
+    approval.approved_by = approvedBy;
+    approval.approved_at = new Date().toISOString();
+    approval.rationale = rationale;
+    this.persist();
+    this.logAudit(approval.contract_id, `APPROVAL_${status}`, {
+      approval_id: id,
+      approved_by: approvedBy,
+      rationale,
+    });
+    return approval;
+  }
+
+  // Transactions list compiled for AG Grid
+  getAllTransactions(): TransactionRecord[] {
+    this.load();
+    const records: TransactionRecord[] = [];
+
+    for (const contract of Object.values(this.state.contracts || {})) {
+      const isSimulated =
+        !contract.paypal_order_id ||
+        contract.paypal_order_id.startsWith('SANDBOX_') ||
+        contract.id.startsWith('ct_intel_') ||
+        contract.id.startsWith('ct_reconcile_');
+      const dataSource: 'Simulated Demo' | 'Live PayPal Sandbox' = isSimulated
+        ? 'Simulated Demo'
+        : 'Live PayPal Sandbox';
+      const providerName = 'PayPal Sandbox';
+
+      if (!contract.milestones || contract.milestones.length === 0) {
+        records.push({
+          id: `TXN-${contract.id.replace('ct_', '').slice(0, 8).toUpperCase()}-HOLD`,
+          contract_id: contract.id,
+          title: `${contract.title} (Pre-Auth Hold)`,
+          provider: providerName,
+          data_source: dataSource,
+          is_simulated: isSimulated,
+          amount: contract.total_amount,
+          currency: contract.currency,
+          payment_state: contract.status === 'VOIDED' ? 'Voided' : 'Held',
+          verification: 'Passed',
+          risk: 'Low',
+          ai_assessment: 'Authorization Hold Verified',
+          reconciliation: 'Confirmed',
+          updated_at: contract.updated_at || contract.created_at,
+          details: {
+            paypal_order_id: contract.paypal_order_id,
+            paypal_auth_id: contract.paypal_auth_id,
+            buyer_agent_id: contract.buyer_agent_id,
+            worker_agent_id: contract.worker_agent_id,
+            audit_events_count: (this.state.audit_logs || []).filter((a) => a.contract_id === contract.id).length,
+            requires_human_approval: false,
+          },
+        });
+        continue;
+      }
+
+      for (const m of contract.milestones) {
+        let paymentState: TransactionRecord['payment_state'] = 'Pending Review';
+        if (m.status === 'ACCEPTED_SETTLED') paymentState = 'Captured';
+        else if (m.status === 'VOIDED') paymentState = 'Voided';
+        else if (contract.status === 'ESCROW_HELD' || contract.status === 'PARTIALLY_SETTLED') paymentState = 'Authorized';
+
+        let verification: TransactionRecord['verification'] = 'Pending';
+        if (m.verification_trace?.deterministic?.passed) {
+          verification = m.verification_trace?.adversarial?.vetoed ? 'Vetoed' : 'Passed';
+        } else if (m.rejection_reason) {
+          verification = 'Rejected';
+        }
+
+        let risk: TransactionRecord['risk'] = 'Low';
+        if (verification === 'Vetoed' || verification === 'Rejected') {
+          risk = 'High';
+        } else if (parseFloat(m.amount) > 100 || m.status === 'VERIFYING') {
+          risk = 'Review Required';
+        } else if (verification === 'Pending') {
+          risk = 'Medium';
+        }
+
+        let aiAssessment = 'Recommendation Available';
+        if (m.verification_trace?.adversarial?.vetoed) {
+          aiAssessment = 'Adversarial Vetoed';
+        } else if (verification === 'Passed') {
+          aiAssessment = 'Verified Clear';
+        }
+
+        const receipt = Object.values(this.state.receipts || {}).find((r) => r.milestone_id === m.id);
+
+        records.push({
+          id: `TXN-${m.id.replace('ms_', '').slice(0, 8).toUpperCase()}`,
+          contract_id: contract.id,
+          milestone_id: m.id,
+          title: m.title,
+          provider: providerName,
+          data_source: dataSource,
+          is_simulated: isSimulated,
+          amount: m.amount,
+          currency: m.currency,
+          payment_state: paymentState,
+          verification,
+          risk,
+          ai_assessment: aiAssessment,
+          reconciliation: m.paypal_capture_id ? 'Confirmed' : contract.status === 'VOIDED' ? 'Reconciled' : 'Pending Sync',
+          updated_at: m.settled_at || contract.updated_at || contract.created_at,
+          details: {
+            paypal_order_id: contract.paypal_order_id,
+            paypal_auth_id: contract.paypal_auth_id,
+            paypal_capture_id: m.paypal_capture_id,
+            buyer_agent_id: contract.buyer_agent_id,
+            worker_agent_id: contract.worker_agent_id,
+            deliverable_hash: m.deliverable_hash,
+            receipt_id: receipt?.receipt_id,
+            verification_trace: m.verification_trace,
+            audit_events_count: (this.state.audit_logs || []).filter((a) => a.contract_id === contract.id).length,
+            requires_human_approval: risk === 'Review Required' || risk === 'High',
+          },
+        });
+      }
+    }
+
+    return records.sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime());
+  }
+
   clear() {
-    this.state = { contracts: {}, receipts: {}, audit_logs: [] };
+    this.state = { contracts: {}, receipts: {}, approvals: {}, audit_logs: [] };
     this.persist();
   }
 }
