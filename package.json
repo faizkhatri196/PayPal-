@@ -8,15 +8,16 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "concurrently \"npm run dev --workspace=@holdfast/server\" \"npm run dev --workspace=@holdfast/web\"",
+    "dev": "npx concurrently \"npm run dev --workspace=@holdfast/server\" \"npm run dev --workspace=@holdfast/web\"",
     "dev:server": "npm run dev --workspace=@holdfast/server",
     "dev:web": "npm run dev --workspace=@holdfast/web",
     "dev:mcp": "node packages/mcp-server/dist/index.js",
     "build": "npm run build --workspaces",
-    "test": "npx vitest run tests/",
+    "test": "npx vitest run tests/ --exclude \"Holdfast-Protocol-Release/**\" --exclude \"Holdfast-Protocol-Submission/**\"",
     "test:proof": "npx vitest run tests/proof-suite.test.ts",
     "health-check": "node scripts/health-check.mjs",
-    "package:submission": "node scripts/package-submission.mjs"
+    "package:submission": "node scripts/package-submission.mjs",
+    "release:package": "node scripts/build-release-zip.mjs"
   },
   "devDependencies": {
     "concurrently": "^9.1.2",
