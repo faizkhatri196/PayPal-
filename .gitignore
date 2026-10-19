@@ -34,4 +34,6 @@ Thumbs.db
 
 # Submission folder and archives
 Holdfast-Protocol-Submission/
+Holdfast-Protocol-Release/
+temp_zip_check/
 *.zip
