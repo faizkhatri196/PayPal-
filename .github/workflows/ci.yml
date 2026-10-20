@@ -28,7 +28,11 @@ jobs:
         run: npm ci
 
       - name: Run Test Suite (Money Invariants & Proof Suite)
-        run: npx vitest run
+        run: npm test
+        env:
+          PORT: 4000
+          NODE_ENV: test
+          RECEIPT_SECRET: holdfast_receipt_hmac_secret_2026
 
-      - name: Build Web Application
-        run: npm run build --workspace=apps/web
+      - name: Build All Workspaces
+        run: npm run build

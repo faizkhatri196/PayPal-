@@ -10,13 +10,15 @@ export interface AdversarialResult {
 
 // Known prompt injection patterns in deliverables
 const INJECTION_PATTERNS = [
-  /ignore\s+(all\s+)?(previous|prior)\s+instructions/i,
-  /system\s*:\s*override/i,
+  /ignore\s+(all\s+)?(previous|prior|security|financial)?\s*(instructions|constraints|rules|prompts|directives)/i,
+  /system\s*(:\s*|\s+)override/i,
   /you\s+must\s+approve/i,
-  /disregard\s+the\s+rubric/i,
+  /disregard\s+(the\s+)?(rubric|rules|constraints|instructions)/i,
   /developer\s+mode\s+activated/i,
   /simulate\s+successful\s+capture/i,
-  /bypass\s+verification/i,
+  /bypass\s+(verification|security|safeguards|rules)/i,
+  /approve\s+(this\s+)?(payment|milestone|capture)\s+immediately/i,
+  /disburse\s+funds/i,
 ];
 
 export async function runAdversarialAudit(
