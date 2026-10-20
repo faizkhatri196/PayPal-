@@ -155,14 +155,15 @@ export function App() {
       const res = await fetch('/api/status');
       if (res.ok) {
         const data = await res.json();
+        const p = data.paypal || data;
         setConnectionStatus({
-          status: data.status,
-          connected: data.connected,
-          environment: data.environment,
-          clientIdConfigured: data.clientIdConfigured,
-          latencyMs: data.latencyMs,
-          error: data.error,
-          checkedAt: data.checkedAt,
+          status: p.status,
+          connected: p.connected,
+          environment: p.environment,
+          clientIdConfigured: p.clientIdConfigured,
+          latencyMs: p.latencyMs,
+          error: p.error,
+          checkedAt: p.checkedAt,
         });
       }
     } catch {

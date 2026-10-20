@@ -313,6 +313,16 @@ Holdfast exposes a full MCP server (`packages/mcp-server`) communicating over st
 
 ---
 
-## 16. License
+## 16. Product Demonstration Video
+
+The repository includes a verified, 1080p full product presentation with timed narration and live browser interactions:
+- **Demonstration Video:** [`demo/Holdfast-Protocol-Professional-Demo.mp4`](demo/Holdfast-Protocol-Professional-Demo.mp4) (Duration: `00:02:46`, 1920x1080 30 FPS, H.264 / AAC)
+- **Standard Mirror:** [`demo/Holdfast-Protocol-Demo.mp4`](demo/Holdfast-Protocol-Demo.mp4)
+- **Timed Narration Script:** [`docs/PROFESSIONAL_DEMO_SCRIPT.md`](docs/PROFESSIONAL_DEMO_SCRIPT.md)
+- **Production & Engineering Notes:** [`docs/VIDEO_PRODUCTION_NOTES.md`](docs/VIDEO_PRODUCTION_NOTES.md)
+
+---
+
+## 17. License
 
 This project is licensed under the **MIT License** — see the [LICENSE](LICENSE) file for details.

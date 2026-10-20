@@ -8,8 +8,10 @@ This document details the production specifications, encoding pipeline, and play
 
 | Deliverable | Location | Specs | Status |
 | :--- | :--- | :--- | :--- |
-| **Professional Product Demo** | `demo/Holdfast-Protocol-Professional-Demo.mp4` | 1920x1080 (16:9), 30 FPS, H.264 High Profile, AAC 22.05 kHz, 2m 48s, 6.51 MB | **VERIFIED ON DISK** |
-| **Standard Demo Mirror** | `demo/Holdfast-Protocol-Demo.mp4` | 1920x1080 (16:9), 30 FPS, H.264 High Profile, AAC 22.05 kHz, 2m 48s, 6.51 MB | **VERIFIED ON DISK** |
+| Deliverable | Location | Specs | Status |
+| :--- | :--- | :--- | :--- |
+| **Professional Product Demo** | `demo/Holdfast-Protocol-Professional-Demo.mp4` | 1920x1080 (16:9), 30 FPS, H.264 High Profile, AAC 22.05 kHz, 2m 46s, 6.43 MB | **VERIFIED ON DISK** |
+| **Standard Demo Mirror** | `demo/Holdfast-Protocol-Demo.mp4` | 1920x1080 (16:9), 30 FPS, H.264 High Profile, AAC 22.05 kHz, 2m 46s, 6.43 MB | **VERIFIED ON DISK** |
 | **Subtitles Track** | `demo/assets/Holdfast_Protocol_Professional_Demo.srt` | SubRip UTF-8, 8 timestamped segments | **VERIFIED ON DISK** |
 | **Master Voiceover Track** | `demo/assets/professional_voiceover.wav` | PCM 16-bit, 22.05 kHz mono, 2m 46s, 7.4 MB | **VERIFIED ON DISK** |
 
@@ -24,13 +26,13 @@ This document details the production specifications, encoding pipeline, and play
   - Dimensions: `1920 x 1080` (Native 1080p, 16:9 aspect ratio)
   - Frame Rate: `30.000 FPS constant`
   - Pixel Format: `YUV 4:2:0 planar`
-  - Bitrate: `~218 kbps average` (variable bit rate, tuned for sharp UI typography)
+  - Bitrate: `~238 kbps average` (variable bit rate, tuned for sharp UI typography)
 - **Audio Stream:**
   - Codec: `AAC (Advanced Audio Coding - Low Complexity)`
   - Sampling Rate: `22,050 Hz`
   - Channels: `1 (Mono)`
-  - Bitrate: `~87 kbps`
-- **Total Duration:** `00:02:48.01` (168 seconds)
+  - Bitrate: `~80 kbps`
+- **Total Duration:** `00:02:46.00` (166 seconds)
   - Exactly within the strict hackathon window of 2 minutes 40 seconds to 2 minutes 55 seconds (< 180 seconds).
 
 ---
@@ -41,13 +43,13 @@ This document details the production specifications, encoding pipeline, and play
    - Script: `scripts/generate-professional-narration.ps1`
    - Engine: Windows `System.Speech.Synthesis` with standard conversational cadence (`Rate = 0`).
    - Timed segments with natural breathing pauses between scenes.
-2. **Visual Sequencing:**
-   - Script: `scripts/render-professional-demo.mjs`
-   - Master Engine: Static FFmpeg build (`v6.1.1`).
-   - High-contrast 1080p application captures sequenced via concat demuxer.
-   - Padded with letterbox prevention filters (`scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2`).
+2. **Live Browser Automation & Recording:**
+   - Script: `scripts/record-genuine-demo.mjs`
+   - Automation: Automated Chrome instance launched at native 1920x1080 with Chrome DevTools Protocol (CDP) screencast streaming frames at 30 FPS.
+   - Master Encoder: Static FFmpeg build (`v6.1.1`).
+   - Real-time interactions: executes 8 distinct scenes against the local application at `http://localhost:3000` (Scenario clicks, AG Grid search, column sorting, inspector drawer, and Sandbox connection probe).
 3. **Audio-Video Multiplexing:**
-   - Concat video track paired with master speech track using `-shortest` and `-c:v libx264 -crf 18 -preset fast`.
+   - Screencast video stream multiplexed directly with master audio narration track at 30 FPS constant using `-c:v libx264 -preset fast -crf 18 -pix_fmt yuv420p -c:a aac -b:a 192k`.
 
 ---
 
