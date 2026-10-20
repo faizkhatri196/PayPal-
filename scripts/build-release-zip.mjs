@@ -165,8 +165,8 @@ const requiredFiles = [
   path.join('apps', 'web', 'src', 'components', 'TransactionExplorer.tsx'),
   path.join('tests', 'money-invariants.test.ts'),
   path.join('tests', 'proof-suite.test.ts'),
-  path.join('docs', 'DEMO_SCRIPT.md'),
-  path.join('demo', 'Holdfast-Protocol-Demo.mp4'),
+  path.join('docs', 'PROFESSIONAL_DEMO_SCRIPT.md'),
+  path.join('demo', 'Holdfast-Protocol-Professional-Demo.mp4'),
 ];
 
 console.log('\nChecking critical files in extracted archive:');
