@@ -25,6 +25,6 @@
     "typescript": "^5.7.3",
     "vitest": "^3.0.5"
   },
-  "author": "Holdfast Team",
+  "author": "Faiz Khatri <faizkhatri1819@gmail.com>",
   "license": "MIT"
 }
