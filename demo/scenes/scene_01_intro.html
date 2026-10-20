@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Scene 1: Introduction</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    width: 1920px;
+    height: 1080px;
+    background: radial-gradient(circle at 50% 20%, #0d192e 0%, #060b13 70%, #03060a 100%);
+    color: #f1f5f9;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+  }
+  .grid-bg {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image: 
+      linear-gradient(rgba(14, 165, 233, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(14, 165, 233, 0.05) 1px, transparent 1px);
+    background-size: 60px 60px;
+    opacity: 0.6;
+  }
+  .glow {
+    position: absolute;
+    width: 800px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(14, 165, 233, 0.15) 0%, rgba(99, 102, 241, 0.05) 50%, transparent 70%);
+    filter: blur(60px);
+    pointer-events: none;
+  }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 20px;
+    background: rgba(14, 165, 233, 0.1);
+    border: 1px solid rgba(14, 165, 233, 0.3);
+    border-radius: 9999px;
+    color: #38bdf8;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 32px;
+    box-shadow: 0 0 20px rgba(14, 165, 233, 0.2);
+  }
+  .badge-dot {
+    width: 8px;
+    height: 8px;
+    background: #38bdf8;
+    border-radius: 50%;
+    box-shadow: 0 0 8px #38bdf8;
+  }
+  h1 {
+    font-size: 80px;
+    font-weight: 800;
+    letter-spacing: -2px;
+    line-height: 1.1;
+    text-align: center;
+    margin-bottom: 24px;
+    background: linear-gradient(135deg, #ffffff 30%, #94a3b8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .tagline {
+    font-size: 34px;
+    font-weight: 400;
+    color: #38bdf8;
+    text-align: center;
+    margin-bottom: 48px;
+    letter-spacing: -0.5px;
+  }
+  .problem-card {
+    max-width: 980px;
+    background: rgba(15, 23, 42, 0.7);
+    border: 1px solid rgba(148, 163, 184, 0.15);
+    border-radius: 16px;
+    padding: 28px 40px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  }
+  .problem-icon {
+    width: 56px;
+    height: 56px;
+    background: rgba(239, 68, 68, 0.12);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: #f87171;
+    flex-shrink: 0;
+  }
+  .problem-text {
+    font-size: 20px;
+    line-height: 1.5;
+    color: #cbd5e1;
+  }
+  .problem-text strong {
+    color: #ffffff;
+  }
+</style>
+</head>
+<body>
+<div class="grid-bg"></div>
+<div class="glow"></div>
+<div style="z-index: 1; display: flex; flex-direction: column; align-items: center;">
+  <div class="badge"><span class="badge-dot"></span> PayPal Opportunity Hackathon Submission</div>
+  <h1>HOLDFAST PROTOCOL</h1>
+  <div class="tagline">Trust infrastructure for AI-powered commerce</div>
+  <div class="problem-card">
+    <div class="problem-icon">!</div>
+    <div class="problem-text">
+      <strong>The Fundamental AI Commerce Problem:</strong> Autonomous agents cannot be permitted to authoritatively sign or capture financial transactions based solely on non-deterministic LLM probabilistic reasoning.
+    </div>
+  </div>
+</div>
+</body>
+</html>

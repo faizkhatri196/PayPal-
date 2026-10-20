@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Scene 2: Product Architecture</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    width: 1920px;
+    height: 1080px;
+    background: radial-gradient(circle at 50% 30%, #0d192e 0%, #060b13 70%, #03060a 100%);
+    color: #f1f5f9;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+    padding: 60px;
+  }
+  .grid-bg {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image: 
+      linear-gradient(rgba(14, 165, 233, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(14, 165, 233, 0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+    opacity: 0.5;
+  }
+  .header-box {
+    text-align: center;
+    margin-bottom: 50px;
+    z-index: 1;
+  }
+  .header-tag {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: #38bdf8;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  h2 {
+    font-size: 48px;
+    font-weight: 800;
+    background: linear-gradient(135deg, #ffffff 40%, #94a3b8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .flow-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    width: 100%;
+    max-width: 1680px;
+    z-index: 1;
+  }
+  .node-card {
+    flex: 1;
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    border-radius: 18px;
+    padding: 32px 24px;
+    display: flex;
+    flex-direction: column;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5);
+    position: relative;
+    min-height: 380px;
+  }
+  .node-card.gate1 {
+    border-color: rgba(56, 189, 248, 0.5);
+    box-shadow: 0 0 30px rgba(14, 165, 233, 0.15);
+  }
+  .node-card.gate2 {
+    border-color: rgba(168, 85, 247, 0.5);
+    box-shadow: 0 0 30px rgba(168, 85, 247, 0.15);
+  }
+  .node-card.paypal {
+    border-color: rgba(34, 197, 94, 0.5);
+    box-shadow: 0 0 30px rgba(34, 197, 94, 0.15);
+  }
+  .card-badge {
+    align-self: flex-start;
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .badge-agent { background: rgba(148, 163, 184, 0.15); color: #cbd5e1; }
+  .badge-gate1 { background: rgba(56, 189, 248, 0.18); color: #38bdf8; }
+  .badge-gate2 { background: rgba(168, 85, 247, 0.18); color: #c084fc; }
+  .badge-paypal { background: rgba(34, 197, 94, 0.18); color: #4ade80; }
+
+  .node-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 12px;
+  }
+  .node-desc {
+    font-size: 15px;
+    line-height: 1.5;
+    color: #94a3b8;
+    margin-bottom: 20px;
+    flex-grow: 1;
+  }
+  .node-rules {
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    font-size: 13px;
+    color: #38bdf8;
+    border-left: 3px solid #38bdf8;
+  }
+  .arrow {
+    font-size: 28px;
+    color: #475569;
+    font-weight: 800;
+    flex-shrink: 0;
+  }
+  .footer-rule {
+    margin-top: 40px;
+    padding: 14px 28px;
+    background: rgba(239, 68, 68, 0.08);
+    border: 1px solid rgba(239, 68, 68, 0.25);
+    border-radius: 10px;
+    color: #fca5a5;
+    font-size: 16px;
+    font-weight: 500;
+    z-index: 1;
+  }
+</style>
+</head>
+<body>
+<div class="grid-bg"></div>
+<div class="header-box">
+  <div class="header-tag">Core Architecture</div>
+  <h2>Dual-Gate Deterministic Payment Pipeline</h2>
+</div>
+
+<div class="flow-container">
+  <div class="node-card">
+    <div class="card-badge badge-agent">Untrusted Source</div>
+    <div class="node-title">AI Autonomous Agent</div>
+    <div class="node-desc">Autonomous model formulates milestone work and requests payment settlement for delivered service.</div>
+    <div class="node-rules" style="color: #cbd5e1; border-color: #64748b;">
+      POST /api/contracts/settle<br>
+      { milestoneId, amount, proof }
+    </div>
+  </div>
+
+  <div class="arrow">➔</div>
+
+  <div class="node-card gate1">
+    <div class="card-badge badge-gate1">Gate 1: Invariant Check</div>
+    <div class="node-title">Deterministic Policy</div>
+    <div class="node-desc">Rigid mathematical verification. Zero LLM involvement. Checks hold balances, ceilings, and single-settlement rules.</div>
+    <div class="node-rules">
+      amount &lt;= remaining_hold<br>
+      state === AUTHORIZED
+    </div>
+  </div>
+
+  <div class="arrow">➔</div>
+
+  <div class="node-card gate2">
+    <div class="card-badge badge-gate2">Gate 2: Security Veto</div>
+    <div class="node-title">Evidence & Veto Audit</div>
+    <div class="node-desc">Cryptographic hash validation and AI security review. Can veto invalid proofs, but cannot independently approve.</div>
+    <div class="node-rules" style="color: #c084fc; border-color: #a855f7;">
+      HMAC-SHA256 receipt minted<br>
+      Veto-Only Audit Principle
+    </div>
+  </div>
+
+  <div class="arrow">➔</div>
+
+  <div class="node-card paypal">
+    <div class="card-badge badge-paypal">Execution Boundary</div>
+    <div class="node-title">Authorized PayPal Flow</div>
+    <div class="node-desc">Captures authorized tranche against pre-existing PayPal order. Updates audit ledger and releases escrow.</div>
+    <div class="node-rules" style="color: #4ade80; border-color: #22c55e;">
+      v2/payments/captures<br>
+      Reconciled & Ledger-Sealed
+    </div>
+  </div>
+</div>
+
+<div class="footer-rule">
+  <strong>Fintech Safety Invariant:</strong> LLMs never have direct payment capture credentials. Only dual-gate cryptographically signed manifests trigger execution.
+</div>
+</body>
+</html>

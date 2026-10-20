@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Scene 9: System Architecture & Open Source</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    width: 1920px;
+    height: 1080px;
+    background: radial-gradient(circle at 50% 30%, #0d192e 0%, #060b13 70%, #03060a 100%);
+    color: #f1f5f9;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+    padding: 60px;
+  }
+  .grid-bg {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image: 
+      linear-gradient(rgba(14, 165, 233, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(14, 165, 233, 0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+    opacity: 0.5;
+  }
+  .header-box {
+    text-align: center;
+    margin-bottom: 40px;
+    z-index: 1;
+  }
+  .header-tag {
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: #38bdf8;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  h2 {
+    font-size: 44px;
+    font-weight: 800;
+    background: linear-gradient(135deg, #ffffff 40%, #94a3b8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .content-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+    width: 100%;
+    max-width: 1680px;
+    margin-bottom: 40px;
+    z-index: 1;
+  }
+  .stack-card {
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    border-radius: 16px;
+    padding: 28px 24px;
+    display: flex;
+    flex-direction: column;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5);
+  }
+  .card-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 18px;
+    margin-bottom: 16px;
+  }
+  .icon-blue { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); }
+  .icon-green { background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3); }
+  .icon-purple { background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3); }
+  .icon-amber { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+  
+  .card-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 10px;
+  }
+  .card-desc {
+    font-size: 14px;
+    line-height: 1.5;
+    color: #94a3b8;
+    margin-bottom: 16px;
+    flex-grow: 1;
+  }
+  .card-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .pill {
+    padding: 4px 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    font-size: 12px;
+    font-family: monospace;
+    color: #cbd5e1;
+  }
+  .repo-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 1680px;
+    background: rgba(30, 41, 59, 0.7);
+    border: 1px solid rgba(56, 189, 248, 0.35);
+    border-radius: 14px;
+    padding: 20px 32px;
+    z-index: 1;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+  }
+  .repo-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .repo-badge {
+    padding: 6px 12px;
+    background: rgba(56, 189, 248, 0.15);
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #38bdf8;
+    text-transform: uppercase;
+  }
+  .repo-url {
+    font-size: 20px;
+    font-family: monospace;
+    font-weight: 600;
+    color: #ffffff;
+  }
+  .repo-stats {
+    display: flex;
+    gap: 24px;
+    color: #94a3b8;
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .stat-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .stat-val {
+    color: #ffffff;
+    font-weight: 700;
+  }
+</style>
+</head>
+<body>
+<div class="grid-bg"></div>
+<div class="header-box">
+  <div class="header-tag">Production Stack</div>
+  <h2>Verified Architecture & Open-Source Foundation</h2>
+</div>
+
+<div class="content-grid">
+  <div class="stack-card">
+    <div class="card-icon icon-blue">FE</div>
+    <div class="card-title">Cockpit Frontend</div>
+    <div class="card-desc">Modern fintech dashboard with real-time lifecycle tracking, decision panel, and audit telemetry.</div>
+    <div class="card-pills">
+      <span class="pill">React 18</span>
+      <span class="pill">TypeScript</span>
+      <span class="pill">AG Grid Community</span>
+      <span class="pill">Vite</span>
+    </div>
+  </div>
+
+  <div class="stack-card">
+    <div class="card-icon icon-green">BE</div>
+    <div class="card-title">Fintech API Server</div>
+    <div class="card-desc">Express API managing contracts, escrow states, deterministic invariant validation, and audit receipts.</div>
+    <div class="card-pills">
+      <span class="pill">Node.js</span>
+      <span class="pill">TypeScript</span>
+      <span class="pill">HMAC-SHA256</span>
+      <span class="pill">Vitest (44 tests)</span>
+    </div>
+  </div>
+
+  <div class="stack-card">
+    <div class="card-icon icon-purple">PP</div>
+    <div class="card-title">PayPal SDK Integration</div>
+    <div class="card-desc">Direct Orders v2 authorization & Payments v2 capture integration with verified Sandbox connectivity.</div>
+    <div class="card-pills">
+      <span class="pill">Orders v2</span>
+      <span class="pill">Payments v2</span>
+      <span class="pill">OAuth 2.0</span>
+      <span class="pill">Reconciliation</span>
+    </div>
+  </div>
+
+  <div class="stack-card">
+    <div class="card-icon icon-amber">AI</div>
+    <div class="card-title">MCP Agent Interface</div>
+    <div class="card-desc">Model Context Protocol server allowing external AI agents to discover invariants and submit work proofs.</div>
+    <div class="card-pills">
+      <span class="pill">MCP SDK</span>
+      <span class="pill">JSON-RPC</span>
+      <span class="pill">Veto Gate</span>
+      <span class="pill">Zero Key Exposure</span>
+    </div>
+  </div>
+</div>
+
+<div class="repo-banner">
+  <div class="repo-info">
+    <div class="repo-badge">Public Repository</div>
+    <div class="repo-url">https://github.com/faizkhatri196/PayPal-Hackthon</div>
+  </div>
+  <div class="repo-stats">
+    <div class="stat-item">Tests: <span class="stat-val">44 / 44 Passing</span></div>
+    <div class="stat-item">CI: <span class="stat-val">GitHub Actions Green</span></div>
+    <div class="stat-item">License: <span class="stat-val">MIT</span></div>
+  </div>
+</div>
+</body>
+</html>

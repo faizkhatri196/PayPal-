@@ -1,33 +1,120 @@
-﻿1
-00:00:00,000 --> 00:00:15,000
-Holdfast Protocol. Trust infrastructure for AI-powered commerce. Payments for AI agents, with verifiable safeguards.
+1
+00:00:00,000 --> 00:00:05,500
+Welcome to Holdfast Protocol: trust infrastructure for AI-powered commerce.
 
 2
-00:00:15,000 --> 00:00:35,000
-AI agents can prepare work, recommend actions, and request payments. But a payment system needs enforceable rules and verifiable evidence. Holdfast adds a verification layer between an agent's request and an eligible payment operation.
+00:00:05,500 --> 00:00:14,039
+As autonomous agents conduct transactions, businesses cannot rely solely on an AI model's judgment to authorize payments.
 
 3
-00:00:35,000 --> 00:01:00,000
-In Demo Simulated mode, we trigger our standard settlement scenario. A worker agent submits market extraction data. Gate 1 executes deterministic schema and boundary validation, while Gate 2 performs an adversarial security review. Both gates pass, issuing an HMAC acceptance receipt. Notice the clear indicator: this scenario is simulated and moves zero real funds.
+00:00:14,539 --> 00:00:18,339
+Holdfast introduces a dual-gate architecture.
 
 4
-00:01:00,000 --> 00:01:25,000
-Next, what happens when an agent requests more than its authorized limit? Here, the agent requests one hundred and fifty dollars against a one hundred dollar hold. Holdfast checks the requested amount against deterministic financial invariants. This request exceeds the authorized ceiling, so the policy blocks it before capture is dispatched. Exactly zero dollars are moved.
+00:00:18,339 --> 00:00:24,339
+When an agent requests a payment, it must first pass deterministic financial invariant checks,
 
 5
-00:01:25,000 --> 00:01:50,000
-In our third scenario, an adversarial payload attempts a prompt injection override. Gate 2 evaluates the content under our strict Veto-Only Principle. The AI security reviewer can flag or veto suspicious requests. It cannot grant payment authority or override deterministic financial rules. The injection is detected and capture is blocked.
+00:00:24,339 --> 00:00:29,739
+followed by cryptographic evidence verification, before entering the authorized payment workflow.
 
 6
-00:01:50,000 --> 00:02:15,000
-All contract events are surfaced in our full-width AG Grid Community ledger. Operators can search transactions, sort numeric amounts, and filter by payment state or environment. Selecting any row instantly focuses the payment decision panel, and clicking Inspect opens our slide-over drawer with provider references and evidence details without squeezing the table.
+00:00:29,739 --> 00:00:33,640
+AI advises, but mathematical rules govern.
 
 7
-00:02:15,000 --> 00:02:35,000
-Holdfast integrates directly with PayPal. Our live connection probe verifies OAuth with the PayPal Sandbox API. In production, Holdfast enforces a clean five-stage boundary: OAuth verification, order creation, interactive buyer approval, pre-authorization hold, and programmatic capture upon verified evidence.
+00:00:34,140 --> 00:00:42,640
+Here in the Holdfast operations cockpit, operators monitor pre-authorized holds, settled volume, and live system health.
 
 8
-00:02:35,000 --> 00:02:50,000
-Holdfast Protocol. Verifiable safeguards for AI-powered commerce. Explore our open source repository, automated test suites, and documentation at github dot com slash faizkhatri196 slash PayPal-Hackthon. Thank you.
+00:00:42,640 --> 00:00:49,259
+Every transaction tracks through a verifiable four-stage payment lifecycle recorded directly into the audit ledger.
 
+9
+00:00:49,759 --> 00:00:53,960
+Let us execute a standard fifteen-dollar payment scenario.
+
+10
+00:00:53,960 --> 00:00:58,560
+In this simulated demonstration, clearly labeled Demo Simulated,
+
+11
+00:00:58,560 --> 00:01:03,959
+the transaction passes deterministic policy rules, completes evidence verification,
+
+12
+00:01:03,959 --> 00:01:10,039
+and mints an HMAC-SHA256 acceptance receipt with zero exposure to live funds.
+
+13
+00:01:10,539 --> 00:01:14,039
+Next, we test financial policy enforcement.
+
+14
+00:01:14,039 --> 00:01:20,339
+An agent attempts to charge one hundred fifty dollars against a strict one hundred dollar hold ceiling.
+
+15
+00:01:20,339 --> 00:01:24,539
+The deterministic engine immediately rejects the request before capture,
+
+16
+00:01:24,539 --> 00:01:28,559
+ensuring zero dollars moved and preventing balance depletion.
+
+17
+00:01:29,059 --> 00:01:35,259
+Now we simulate an adversarial prompt injection attempting unauthorized fee escalation.
+
+18
+00:01:35,259 --> 00:01:38,559
+Holdfast applies a strict veto-only principle:
+
+19
+00:01:38,559 --> 00:01:43,559
+security audits can veto transactions, but can never authorize them.
+
+20
+00:01:43,559 --> 00:01:47,199
+The attack is flagged, logged, and safely neutralized.
+
+21
+00:01:47,699 --> 00:01:54,899
+In the AG Grid ledger, operators can search transactions, sort by amount, and filter by status.
+
+22
+00:01:54,899 --> 00:01:58,499
+Selecting a transaction opens the inspector drawer,
+
+23
+00:01:58,499 --> 00:02:05,409
+revealing cryptographic payload hashes, verification timestamps, and complete deterministic audit trails.
+
+24
+00:02:05,909 --> 00:02:09,909
+Holdfast integrates directly with PayPal Sandbox APIs.
+
+25
+00:02:09,909 --> 00:02:15,409
+The platform continuously monitors OAuth connectivity and token health,
+
+26
+00:02:15,409 --> 00:02:23,019
+maintaining a strict architectural boundary between sandbox testing and buyer approval, authorization, and capture workflows.
+
+27
+00:02:23,519 --> 00:02:32,019
+Built with a React TypeScript frontend, Node.js backend, deterministic policy engine, and Model Context Protocol server,
+
+28
+00:02:32,019 --> 00:02:38,639
+the entire codebase is fully open source on GitHub at faizkhatri196 slash PayPal-Hackthon.
+
+29
+00:02:39,139 --> 00:02:44,139
+Holdfast Protocol: verifiable safeguards for AI-powered commerce.
+
+30
+00:02:44,139 --> 00:02:49,199
+Deterministic security for the next generation of autonomous payments.
 
