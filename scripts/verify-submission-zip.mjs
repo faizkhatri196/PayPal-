@@ -2,8 +2,15 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execSync } from 'node:child_process';
 
-const zipPath = process.env.SUBMISSION_ZIP || path.resolve(process.cwd(), '..', 'Holdfast_Protocol_Submission.zip');
-const tempExtractDir = process.env.TEMP_EXTRACT_DIR || path.resolve(process.cwd(), '..', 'zip_verify_test');
+const candidateZips = [
+  process.env.SUBMISSION_ZIP,
+  path.resolve(process.cwd(), 'Holdfast-Protocol-Submission.zip'),
+  path.resolve(process.cwd(), 'Holdfast-Protocol-Release.zip'),
+  path.resolve(process.cwd(), '..', 'Holdfast_Protocol_Submission.zip'),
+].filter(Boolean);
+
+const zipPath = candidateZips.find(p => fs.existsSync(p)) || candidateZips[0];
+const tempExtractDir = process.env.TEMP_EXTRACT_DIR || path.resolve(process.cwd(), 'temp_zip_check');
 
 if (fs.existsSync(tempExtractDir)) {
   fs.rmSync(tempExtractDir, { recursive: true, force: true });

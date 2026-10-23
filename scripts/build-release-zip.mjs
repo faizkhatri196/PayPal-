@@ -37,6 +37,8 @@ const EXCLUDE_FILES = new Set([
   'Thumbs.db',
   'Holdfast-Protocol-Release.zip',
   'Holdfast_Protocol_Submission.zip',
+  'Holdfast-Protocol-Submission.zip',
+  'professional_voiceover.wav',
 ]);
 
 function copyDirRecursive(src, dest) {
@@ -50,16 +52,17 @@ function copyDirRecursive(src, dest) {
     const srcPath = path.join(src, entry.name);
     const destPath = path.join(dest, entry.name);
 
-    if (entry.isDirectory()) {
+    const stat = fs.statSync(srcPath);
+    if (stat.isDirectory()) {
       if (EXCLUDE_DIRS.has(entry.name)) {
         continue;
       }
       copyDirRecursive(srcPath, destPath);
-    } else if (entry.isFile()) {
+    } else if (stat.isFile()) {
       if (EXCLUDE_FILES.has(entry.name)) {
         continue;
       }
-      if (entry.name.endsWith('.log') || entry.name.endsWith('.tsbuildinfo')) {
+      if (entry.name.endsWith('.log') || entry.name.endsWith('.tsbuildinfo') || entry.name.endsWith('.wav')) {
         continue;
       }
       if (entry.name.startsWith('.env') && entry.name !== '.env.example') {
@@ -96,8 +99,22 @@ if (!fs.existsSync(ZIP_PATH)) {
   process.exit(1);
 }
 
+const MAX_SIZE_BYTES = 32 * 1024 * 1024; // 32 MB strict ceiling
 const stats = fs.statSync(ZIP_PATH);
-console.log(`✅ ZIP Archive created successfully! Size: ${(stats.size / 1024 / 1024).toFixed(2)} MB (${stats.size} bytes)`);
+const sizeMB = (stats.size / 1024 / 1024).toFixed(2);
+console.log(`✅ ZIP Archive created successfully! Size: ${sizeMB} MB (${stats.size} bytes)`);
+
+if (stats.size > MAX_SIZE_BYTES) {
+  console.error(`❌ FAILED: Archive size (${sizeMB} MB) exceeds maximum permitted size of 32.00 MB!`);
+  process.exit(1);
+} else {
+  console.log(`✅ SIZE CHECK PASSED: Archive is ${sizeMB} MB (strictly under 32.00 MB limit).`);
+}
+
+// Also create Holdfast-Protocol-Submission.zip as mirror
+const SUB_ZIP_PATH = path.resolve(ROOT_DIR, 'Holdfast-Protocol-Submission.zip');
+fs.copyFileSync(ZIP_PATH, SUB_ZIP_PATH);
+console.log(`✅ Mirrored archive to: ${SUB_ZIP_PATH}`);
 
 // 4. Test extraction and verify integrity
 console.log('\nTesting extraction of archive to verify integrity...');
@@ -165,8 +182,16 @@ const requiredFiles = [
   path.join('apps', 'web', 'src', 'components', 'TransactionExplorer.tsx'),
   path.join('tests', 'money-invariants.test.ts'),
   path.join('tests', 'proof-suite.test.ts'),
+  path.join('docs', 'SUBMISSION_DESCRIPTION.md'),
+  path.join('docs', 'SUBMISSION_CHECKLIST.md'),
   path.join('docs', 'PROFESSIONAL_DEMO_SCRIPT.md'),
   path.join('demo', 'Holdfast-Protocol-Professional-Demo.mp4'),
+  path.join('demo', 'Holdfast-Protocol-Demo.mp4'),
+  path.join('demo', 'assets', 'professional_voiceover.mp3'),
+  path.join('demo', 'assets', 'Holdfast_Protocol_Professional_Demo.srt'),
+  path.join('demo', 'assets', 'devpost', 'latest', '01-latest-dashboard.png'),
+  path.join('demo', 'assets', 'devpost', 'latest', 'CAPTIONS.txt'),
+  path.join('presentation', 'Holdfast-Protocol-Pitch.pptx'),
 ];
 
 console.log('\nChecking critical files in extracted archive:');
@@ -187,7 +212,7 @@ fs.rmSync(TEMP_EXTRACT_DIR, { recursive: true, force: true });
 console.log('\nCleaned up verification test directory.');
 
 if (missingCount === 0) {
-  console.log('\n🎉 ALL CHECKS PASSED: Holdfast-Protocol-Release.zip is verified and release-ready!');
+  console.log(`\n🎉 ALL CHECKS PASSED: Holdfast-Protocol-Release.zip (${sizeMB} MB) is verified and release-ready!`);
 } else {
   console.error(`\n❌ Verification failed: ${missingCount} required files missing.`);
   process.exit(1);
