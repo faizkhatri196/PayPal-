@@ -1,0 +1,49 @@
+Holdfast Protocol — Devpost Image Captions
+
+01. Latest Dashboard
+Image: 01-latest-dashboard.png
+Caption: The Holdfast Protocol cockpit decouples AI proposal generation from deterministic policy enforcement to safeguard autonomous commercial transactions.
+
+02. Payment Proposal Creation
+Image: 02-payment-proposal.png
+Caption: Buyers and autonomous agents initiate milestone payment proposals with bounded ceilings using PayPal Orders v2 authorization holds.
+
+03. Policy Engine Configuration
+Image: 03-policy-configuration.png
+Caption: Deterministic policy rules establish fail-closed financial, currency, and lifecycle invariants that AI models cannot override.
+
+04. Valid Payment Decision
+Image: 04-valid-payment-decision.png
+Caption: Proposals that satisfy deterministic schema constraints and pass AI safety checks advance cleanly through the four-stage verification workflow.
+
+05. Spending Limit Rejection
+Image: 05-spending-limit-rejection.png
+Caption: Deterministic policy checks strictly block payment proposals that exceed pre-authorized spending limits, regardless of AI model recommendation.
+
+06. Adversarial Input Testing
+Image: 06-adversarial-input.png
+Caption: Autonomous worker payloads are inspected for prompt injection attempts, override commands, and malformed deliverable schemas.
+
+07. Adversarial Security Decision
+Image: 07-security-decision.png
+Caption: Gate 2 adversarial analysis vetoes exploit attempts matching malicious prompt injection patterns while preserving underlying escrow funds.
+
+08. PayPal Sandbox Integration
+Image: 08-paypal-integration.png
+Caption: Live PayPal Sandbox integration verifies OAuth credentials and tests API handshake latency while keeping secrets secure on the backend.
+
+09. Payment Authorization Hold
+Image: 09-payment-authorization.png
+Caption: PayPal authorization holds lock buyer funds non-custodially for up to 29 days without requiring third-party escrow custody.
+
+10. Payment Milestone Capture
+Image: 10-payment-capture.png
+Caption: Non-custodial capture executes against the verified authorization hold with an idempotency key to prevent duplicate settlement.
+
+11. Transaction Audit Records
+Image: 11-audit-records.png
+Caption: Inspectable decision records provide full transparency into policy evaluations, financial flows, and PayPal provider references.
+
+12. Technical Workflow & Reconciliation
+Image: 12-technical-workflow.png
+Caption: Automated ledger reconciliation audits local contract states against PayPal APIs to recover from upstream network drops without duplicate charges.

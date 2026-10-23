@@ -56,7 +56,7 @@
 | :--- | :--- | :--- |
 | **Project Title** | Holdfast Protocol | `README.md` |
 | **Tagline** | The Acceptance Receipt & Escrow Primitive for Autonomous Agentic Commerce on PayPal | `README.md` |
-| **Video Demo URL** | Public YouTube or Vimeo link (< 3 min) | `docs/DEMO_SCRIPT.md` |
+| **Video Demo URL** | Public YouTube or Vimeo link (< 3 min) | `docs/PROFESSIONAL_DEMO_SCRIPT.md` |
 | **GitHub Repository** | Public GitHub URL with MIT license | `https://github.com/faizkhatri196/PayPal-Hackthon` |
 | **PayPal API Used** | PayPal Orders v2 (Authorize) & Payments v2 (Capture/Void) | `docs/PAYPAL_SANDBOX_GUIDE.md` |
 | **AI Technology Used** | Google GenAI (Gemini 2.5 Flash) & Groq LPU (qwen/qwen3.8-27b) | `docs/ARCHITECTURE.md` |
