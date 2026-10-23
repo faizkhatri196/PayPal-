@@ -8,8 +8,6 @@ This document details the production specifications, encoding pipeline, and play
 
 | Deliverable | Location | Specs | Status |
 | :--- | :--- | :--- | :--- |
-| Deliverable | Location | Specs | Status |
-| :--- | :--- | :--- | :--- |
 | **Professional Product Demo** | `demo/Holdfast-Protocol-Professional-Demo.mp4` | 1920x1080 (16:9), 30 FPS, H.264 High Profile, AAC 22.05 kHz, 2m 46s, 6.43 MB | **VERIFIED ON DISK** |
 | **Standard Demo Mirror** | `demo/Holdfast-Protocol-Demo.mp4` | 1920x1080 (16:9), 30 FPS, H.264 High Profile, AAC 22.05 kHz, 2m 46s, 6.43 MB | **VERIFIED ON DISK** |
 | **Subtitles Track** | `demo/assets/Holdfast_Protocol_Professional_Demo.srt` | SubRip UTF-8, 8 timestamped segments | **VERIFIED ON DISK** |

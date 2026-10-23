@@ -268,7 +268,7 @@ Holdfast exposes a full MCP server (`packages/mcp-server`) communicating over st
   "mcpServers": {
     "holdfast": {
       "command": "node",
-      "args": ["c:/Users/Infinity/OneDrive/Desktop/Paypal Hackthon/packages/mcp-server/dist/index.js"]
+      "args": ["./packages/mcp-server/dist/index.js"]
     }
   }
 }
