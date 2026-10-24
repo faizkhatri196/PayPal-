@@ -8,6 +8,24 @@ const app = express();
 app.use(cors({ origin: CONFIG.CORS_ORIGIN === '*' ? true : CONFIG.CORS_ORIGIN }));
 app.use(express.json({ limit: '10mb' }));
 
+app.get('/', (req, res) => {
+  res.status(200).json({
+    service: 'Holdfast Protocol API',
+    status: 'online',
+    version: '1.0.0',
+    description: 'Trust infrastructure for AI-powered commerce on PayPal',
+    endpoints: {
+      health: '/api/health',
+      status: '/api/status',
+      contracts: '/api/contracts',
+      transactions: '/api/transactions',
+      policies: '/api/policies',
+      receipts: '/api/receipts',
+    },
+    documentation: 'https://github.com/faizkhatri196/PayPal-Hackthon',
+  });
+});
+
 app.use('/api', apiRouter);
 
 // Fallback error handler
