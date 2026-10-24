@@ -79,3 +79,163 @@ npm run build
 # Start production server
 npm run dev:server
 ```
+
+---
+
+## 7. Step-by-Step Deployment: Render (Backend) & Vercel (Frontend)
+
+Holdfast Protocol is built as a TypeScript monorepo with an Express API backend (`apps/server`) and a React + Vite frontend (`apps/web`). The recommended production deployment splits the services across **Render** (for persistent Node.js/Express execution) and **Vercel** (for high-performance global CDN edge delivery of the Vite SPA).
+
+```
+                      ┌─────────────────────────────────┐
+                      │   Vercel Global Edge Network    │
+                      │  (@holdfast/web - React + Vite) │
+                      └────────────────┬────────────────┘
+                                       │
+                      /api/* rewrites  │  (Zero CORS issues)
+                                       ▼
+                      ┌─────────────────────────────────┐
+                      │      Render Web Service         │
+                      │  (@holdfast/server - Node.js)   │
+                      └─────────────────────────────────┘
+```
+
+---
+
+### Step 1: Deploy Backend to Render
+
+You can deploy the backend to Render using either the **Render Dashboard** or the **Render Blueprint (`render.yaml`)**.
+
+#### Method A: Using Render Blueprint (`render.yaml`) (Easiest)
+
+1. Push your repository to GitHub:
+   ```bash
+   git add .
+   git commit -m "feat(deploy): add render and vercel deployment configs"
+   git push origin main
+   ```
+2. Go to [dashboard.render.com](https://dashboard.render.com).
+3. Click **New +** ➔ **Blueprint**.
+4. Connect your GitHub repository (`PayPal-Hackthon`).
+5. Render detects the root [`render.yaml`](file:///c:/Users/Infinity/OneDrive/Desktop/Paypal%20Hackthon/render.yaml) automatically.
+6. Under environment variables, enter your secrets:
+   - `PAYPAL_CLIENT_ID`: Your PayPal Sandbox App Client ID
+   - `PAYPAL_CLIENT_SECRET`: Your PayPal Sandbox App Client Secret
+   - `GEMINI_API_KEY`: Google Gemini API key (optional for AI review)
+7. Click **Apply**.
+8. Once deployed, Render provides your public backend URL (e.g., `https://holdfast-protocol-api.onrender.com`).
+
+#### Method B: Manual Web Service Setup on Render
+
+1. Go to [dashboard.render.com](https://dashboard.render.com) ➔ **New +** ➔ **Web Service**.
+2. Select your GitHub repository (`PayPal-Hackthon`).
+3. Configure the service settings:
+   - **Name**: `holdfast-protocol-api`
+   - **Language**: `Node`
+   - **Branch**: `main`
+   - **Region**: `Oregon (US West)` or closest to your users
+   - **Build Command**:
+     ```bash
+     npm install && npm run build --workspace=@holdfast/server
+     ```
+   - **Start Command**:
+     ```bash
+     node apps/server/dist/index.js
+     ```
+   - **Instance Type**: `Free`
+4. Add Environment Variables:
+   - `NODE_ENV`: `production`
+   - `PORT`: `10000`
+   - `PAYPAL_BASE_URL`: `https://api-m.sandbox.paypal.com`
+   - `PAYPAL_CLIENT_ID`: `<your_sandbox_client_id>`
+   - `PAYPAL_CLIENT_SECRET`: `<your_sandbox_client_secret>`
+   - `RECEIPT_SECRET`: `<generate_random_32_char_hex>`
+   - `CORS_ORIGIN`: `*`
+   - `AI_PROVIDER`: `gemini`
+   - `GEMINI_API_KEY`: `<your_gemini_key>`
+5. Click **Create Web Service**.
+6. Note down the assigned URL: `https://<YOUR-RENDER-APP>.onrender.com`.
+7. Verify health:
+   ```bash
+   curl https://<YOUR-RENDER-APP>.onrender.com/api/health
+   ```
+
+---
+
+### Step 2: Deploy Frontend to Vercel
+
+The root [`vercel.json`](file:///c:/Users/Infinity/OneDrive/Desktop/Paypal%20Hackthon/vercel.json) automatically proxies `/api/*` requests to your Render backend and directs all other routes to `/index.html`.
+
+#### Method A: Using Vercel Dashboard (Recommended)
+
+1. Go to [vercel.com](https://vercel.com) and log in.
+2. Click **Add New...** ➔ **Project**.
+3. Import your GitHub repository (`faizkhatri196/PayPal-Hackthon`).
+4. Configure Project:
+   - **Framework Preset**: `Vite`
+   - **Root Directory**: Leave as `./` (project root)
+   - **Build Command**: (Override if needed): `npm run build --workspace=@holdfast/web`
+   - **Output Directory**: `apps/web/dist`
+5. Update [`vercel.json`](file:///c:/Users/Infinity/OneDrive/Desktop/Paypal%20Hackthon/vercel.json) destination URL with your actual Render URL:
+   ```json
+   {
+     "rewrites": [
+       {
+         "source": "/api/(.*)",
+         "destination": "https://<YOUR-RENDER-APP>.onrender.com/api/$1"
+       },
+       {
+         "source": "/(.*)",
+         "destination": "/index.html"
+       }
+     ]
+   }
+   ```
+6. Click **Deploy**.
+7. Vercel builds the bundle and assigns your production domain (e.g., `https://paypal-hackthon.vercel.app`).
+
+#### Method B: Using Vercel CLI
+
+```bash
+# 1. Install Vercel CLI globally if not already installed
+npm install -g vercel
+
+# 2. Log in to Vercel
+vercel login
+
+# 3. Deploy preview
+vercel
+
+# 4. Deploy directly to production
+vercel --prod
+```
+
+---
+
+### Step 3: Verify the Live Deployment
+
+After both services are running:
+
+1. **Verify Backend Health**:
+   ```bash
+   curl -s https://<YOUR-RENDER-APP>.onrender.com/api/health | jq .
+   ```
+   Expected response:
+   ```json
+   {
+     "status": "ok",
+     "service": "Holdfast Acceptance Receipt Protocol",
+     "paypal_status": "CONNECTED"
+   }
+   ```
+
+2. **Verify Frontend Proxy**:
+   Visit your Vercel URL in your browser:
+   `https://<YOUR-VERCEL-APP>.vercel.app`
+
+3. **Verify Interactive Features**:
+   - The top banner shows `PayPal Sandbox: Connected`.
+   - Run the `$15.00 Standard Settlement` test scenario.
+   - Run the `$150.00 Ceiling Breach` policy check.
+   - Run the `Prompt Injection Veto` test.
+   - Search and sort in the AG Grid ledger.

@@ -12,6 +12,7 @@
     "dev:server": "npm run dev --workspace=@holdfast/server",
     "dev:web": "npm run dev --workspace=@holdfast/web",
     "dev:mcp": "node packages/mcp-server/dist/index.js",
+    "start": "node apps/server/dist/index.js",
     "build": "npm run build --workspaces",
     "test": "npx vitest run tests/ --exclude \"Holdfast-Protocol-Release/**\" --exclude \"Holdfast-Protocol-Submission/**\"",
     "test:proof": "npx vitest run tests/proof-suite.test.ts",
